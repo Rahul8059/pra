@@ -1,0 +1,24 @@
+!pip install pyspark
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("StudentsPerformance").getOrCreate()
+df = spark.read.csv("StudentsPerformance.csv", header=True, inferSchema=True)
+df.show()
+df.show(2)
+df.printSchema()
+df.describe().toPandas()
+df.groupby('gender').count().show()
+import matplotlib.pyplot as plt
+import seaborn as sns
+fig = plt.figure(figsize=(25, 15))
+st = fig.suptitle("Distribution of Features", fontsize=50, verticalalignment="center")
+for col, num in zip(df.toPandas().describe().columns, range(1,11)):
+ ax = fig.add_subplot(3,4, num)
+ ax.hist(df.toPandas()[col])
+ plt.grid(False)
+ plt.xticks(rotation=45, fontsize=20)
+ plt.yticks(fontsize=15)
+ plt.title(col.upper(), fontsize=20)
+plt.tight_layout()
+st.set_y(0.95)
+fig.subplots_adjust(top=0.85, hspace=0.4)
+plt.show()
